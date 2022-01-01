@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "max-diary",
+    "slug": "max-diary",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "max-diary"
+}
