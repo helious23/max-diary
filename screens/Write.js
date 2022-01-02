@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import styled from "styled-components/native";
+import { useDB } from "../context";
 import colors from "../colors";
 
 const View = styled.View`
@@ -58,7 +59,8 @@ const EmotionText = styled.Text`
 
 const emotions = ["😄", "😢", "😡", "🙂", "😍", "🥳"];
 
-const Write = () => {
+const Write = ({ navigation: { goBack } }) => {
+  const realm = useDB();
   const [selectedEmotion, setEmotion] = useState(null);
   const [feelings, setFeelings] = useState("");
   const onChangeText = (text) => setFeelings(text);
@@ -68,7 +70,16 @@ const Write = () => {
       return Alert.alert(`오늘 하루 어떠셨나요? 
 기분을 적어주세요`);
     }
+    realm.write(() => {
+      const feeling = realm.create("Feeling", {
+        _id: Date.now(),
+        emotion: selectedEmotion,
+        message: feelings,
+      });
+    });
+    goBack();
   };
+
   return (
     <View>
       <Title>오늘 기분은 어떠세요?</Title>
