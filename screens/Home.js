@@ -10,6 +10,7 @@ import {
   UIManager,
   Platform,
 } from "react-native";
+import { AdMobBanner } from "expo-ads-admob";
 
 if (
   Platform.OS === "android" &&
@@ -22,13 +23,16 @@ const View = styled.View`
   flex: 1;
   background-color: ${colors.bgColor};
   padding: 0px 30px;
-  padding-top: 100px;
+  padding-top: 50px;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Title = styled.Text`
   color: ${colors.textColor};
   font-size: 48px;
-  margin-bottom: 100px;
+  font-weight: 500;
+  width: 100%;
 `;
 
 const Btn = styled.TouchableOpacity`
@@ -89,9 +93,19 @@ const Home = ({ navigation: { navigate } }) => {
 
   return (
     <View>
+      <AdMobBanner
+        style={{ backgroundColor: colors.bgColor }}
+        bannerSize="banner"
+        adUnitID={
+          Platform.OS === "ios"
+            ? "ca-app-pub-3940256099942544/2934735716"
+            : "ca-app-pub-3940256099942544/6300978111"
+        }
+      />
       <Title>My Diary</Title>
       <FlatList
         data={feelings}
+        style={{ marginVertical: 100, width: "100%" }}
         contentContainerStyle={{ paddingVertical: 10 }}
         ItemSeparatorComponent={Seperator}
         keyExtractor={(feeling) => feeling._id + ""}

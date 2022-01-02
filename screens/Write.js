@@ -3,6 +3,8 @@ import { Alert } from "react-native";
 import styled from "styled-components/native";
 import { useDB } from "../context";
 import colors from "../colors";
+import { AdMobInterstitial, AdMobRewarded } from "expo-ads-admob";
+import { Platform } from "react-native";
 
 const View = styled.View`
   flex: 1;
@@ -23,6 +25,7 @@ const TextInput = styled.TextInput`
   border-radius: 20px;
   padding: 10px 20px;
   font-size: 18px;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 `;
 
 const Btn = styled.TouchableOpacity`
@@ -48,7 +51,7 @@ const Emotions = styled.View`
 
 const Emotion = styled.TouchableOpacity`
   background-color: ${(props) => (props.selected ? colors.btnColor : "white")};
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
   padding: 10px;
   border-radius: 10px;
 `;
@@ -65,19 +68,30 @@ const Write = ({ navigation: { goBack } }) => {
   const [feelings, setFeelings] = useState("");
   const onChangeText = (text) => setFeelings(text);
   const onEmotionPress = (face) => setEmotion(face);
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (feelings === "" || selectedEmotion === null) {
       return Alert.alert(`오늘 하루 어떠셨나요? 
 기분을 적어주세요`);
     }
-    realm.write(() => {
-      const feeling = realm.create("Feeling", {
-        _id: Date.now(),
-        emotion: selectedEmotion,
-        message: feelings,
+    await AdMobRewarded.setAdUnitID(
+      Platform.OS === "ios"
+        ? "ca-app-pub-3940256099942544/1712485313"
+        : "ca-app-pub-3940256099942544/5224354917"
+    );
+    await AdMobRewarded.requestAdAsync();
+    await AdMobRewarded.showAdAsync();
+    AdMobRewarded.addEventListener("rewardedVideoUserDidEarnReward", () => {
+      AdMobRewarded.addEventListener("rewardedVideoDidDismiss", () => {
+        realm.write(() => {
+          realm.create("Feeling", {
+            _id: Date.now(),
+            emotion: selectedEmotion,
+            message: feelings,
+          });
+        });
+        goBack();
       });
     });
-    goBack();
   };
 
   return (
@@ -86,6 +100,7 @@ const Write = ({ navigation: { goBack } }) => {
       <Emotions>
         {emotions.map((emotion, index) => (
           <Emotion
+            style={{ elevation: 20 }}
             selected={emotion === selectedEmotion}
             onPress={() => onEmotionPress(emotion)}
             key={index}
@@ -95,6 +110,7 @@ const Write = ({ navigation: { goBack } }) => {
         ))}
       </Emotions>
       <TextInput
+        style={{ elevation: 20 }}
         returnKeyType="done"
         onSubmitEditing={onSubmit}
         onChangeText={onChangeText}
