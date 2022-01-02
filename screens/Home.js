@@ -6,7 +6,7 @@ import colors from "../colors";
 const View = styled.View`
   flex: 1;
   background-color: ${colors.bgColor};
-  padding: 0px 50px;
+  padding: 0px 30px;
   padding-top: 100px;
 `;
 
@@ -26,6 +26,8 @@ const Btn = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   background-color: ${colors.btnColor};
+  elevation: 5;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
 `;
 
 const BtnText = styled.Text`
